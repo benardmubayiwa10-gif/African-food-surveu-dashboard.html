@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>African Traditional Food Survey - Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Archivo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #D84315;
+            --secondary: #F57C00;
+            --accent: #FFC107;
+            --dark: #1A1A1A;
+            --medium: #2D2D2D;
+            --light: #F5F5F5;
+            --success: #43A047;
+            --info: #1E88E5;
+        }
+
+        body {
+            font-family: 'Archivo', sans-serif;
+            background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+            color: var(--light);
+            overflow-x: hidden;
+            padding: 2rem;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, var(--medium), #252525);
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 5px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(216, 67, 21, 0.3);
+            border-left-color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            font-family: 'Righteous', cursive;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(245, 245, 245, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Section */
+        .section {
+            background: var(--medium);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-top: 3px solid var(--secondary);
+            animation: fadeIn 1s ease-out both;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            font-family: 'Righteous', cursive;
+            letter-spacing: 1px;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            min-width: 150px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .bar-container {
+            flex: 1;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: width 1s ease-out;
+            animation: barGrow 1s ease-out;
+        }
+
+        @keyframes barGrow {
+            from { width: 0; }
+        }
+
+        .bar-value {
+            min-width: 60px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Pie Chart */
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .pie-chart {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            position: relative;
+            background: conic-gradient(
+                var(--success) 0deg 216deg,
+                var(--accent) 216deg 306deg,
+                var(--primary) 306deg 360deg
+            );
+            animation: pieRotate 1s ease-out;
+        }
+
+        @keyframes pieRotate {
+            from { transform: rotate(-90deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+        }
+
+        .legend-text {
+            font-weight: 600;
+        }
+
+        .legend-value {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Progress Bars */
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+            animation: progressGrow 1.5s ease-out;
+        }
+
+        @keyframes progressGrow {
+            from { width: 0; }
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insight-card {
+            background: linear-gradient(145deg, #252525, var(--dark));
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--info);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        .insight-text {
+            color: rgba(245, 245, 245, 0.8);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Recommendations */
+        .recommendations {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .recommendations h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-family: 'Righteous', cursive;
+        }
+
+        .recommendations ul {
+            line-height: 2;
+            font-size: 1.05rem;
+            padding-left: 1.5rem;
+        }
+
+        .recommendations li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 3rem;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .pie-chart {
+                width: 250px;
+                height: 250px;
+            }
+
+            .bar-label {
+                min-width: 100px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🍲 African Food Survey Analytics</h1>
+            <p>Comprehensive Market Research Dashboard</p>
+        </header>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">1,000</div>
+                <div class="stat-label">Total Respondents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60%</div>
+                <div class="stat-label">Interest Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8.5/10</div>
+                <div class="stat-label">Cleanliness Priority</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">72%</div>
+                <div class="stat-label">Positive Sentiment</div>
+            </div>
+        </div>
+
+        <!-- Interest Distribution -->
+        <div class="section">
+            <h2 class="section-title">Interest in Visiting African Restaurant</h2>
+            <div class="pie-chart-container">
+                <div class="pie-chart"></div>
+                <div class="pie-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--success);"></div>
+                        <div class="legend-text">Yes</div>
+                        <div class="legend-value">600 (60%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent);"></div>
+                        <div class="legend-text">Maybe</div>
+                        <div class="legend-value">250 (25%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--primary);"></div>
+                        <div class="legend-text">No</div>
+                        <div class="legend-value">150 (15%)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="grid-2">
+            <!-- Age Distribution -->
+            <div class="section">
+                <h2 class="section-title">Age Distribution</h2>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">18-25</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 20%; background: linear-gradient(90deg, #1E88E5, #42A5F5);"></div>
+                        </div>
+                        <div class="bar-value">200</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">26-35</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 35%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">350</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">36-45</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 25%; background: linear-gradient(90deg, #F57C00, #FF9800);"></div>
+                        </div>
+                        <div class="bar-value">250</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">46-55</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 15%; background: linear-gradient(90deg, #D84315, #FF5722);"></div>
+                        </div>
+                        <div class="bar-value">150</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">56+</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 5%; background: linear-gradient(90deg, #7B1FA2, #9C27B0);"></div>
+                        </div>
+                        <div class="bar-value">50</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Willingness to Pay -->
+            <div class="section">
+                <h2 class="section-title">Willingness to Pay</h2>
+                <div class="bar-chart">
+                    <div class="bar-item">
+                        <div class="bar-label">$10-15</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 20%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">200</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">$15-20</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 30%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">300</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">$20-25</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 25%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">250</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">$25-30</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 15%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">150</div>
+                    </div>
+                    <div class="bar-item">
+                        <div class="bar-label">$30+</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 10%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                        </div>
+                        <div class="bar-value">100</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Importance Factors -->
+        <div class="section">
+            <h2 class="section-title">Importance Factors (Scale 1-10)</h2>
+            <div class="progress-list">
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>🧼 Cleanliness</span>
+                        <span style="color: var(--accent); font-weight: 700;">8.5/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%; background: linear-gradient(90deg, #43A047, #66BB6A);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>😋 Taste</span>
+                        <span style="color: var(--accent); font-weight: 700;">7.8/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%; background: linear-gradient(90deg, #F57C00, #FF9800);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>🎨 Cultural Authenticity</span>
+                        <span style="color: var(--accent); font-weight: 700;">6.8/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 68%; background: linear-gradient(90deg, #1E88E5, #42A5F5);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>💰 Price</span>
+                        <span style="color: var(--accent); font-weight: 700;">6.2/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 62%; background: linear-gradient(90deg, #D84315, #FF5722);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>📍 Location</span>
+                        <span style="color: var(--accent); font-weight: 700;">5.9/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 59%; background: linear-gradient(90deg, #7B1FA2, #9C27B0);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Preferences -->
+        <div class="section">
+            <h2 class="section-title">Most Popular Menu Items</h2>
+            <div class="bar-chart">
+                <div class="bar-item">
+                    <div class="bar-label">Jollof Rice</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 90%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">180</div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Piri Piri Chicken</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 85%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">170</div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Suya</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 82.5%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">165</div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Tagine</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 77.5%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">155</div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Injera</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 72.5%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">145</div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Fufu</div>
+                    <div class="bar-container">
+                        <div class="bar-fill" style="width: 67.5%; background: linear-gradient(90deg, #D84315, #F57C00);"></div>
+                    </div>
+                    <div class="bar-value">135</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Segments -->
+        <div class="section">
+            <h2 class="section-title">Customer Segmentation Analysis</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Segment</th>
+                        <th>Size</th>
+                        <th>Taste Priority</th>
+                        <th>Price Priority</th>
+                        <th>Strategy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: var(--info);">💰 Price Conscious</strong></td>
+                        <td>300 (30%)</td>
+                        <td>6.5/10</td>
+                        <td>8.2/10</td>
+                        <td>Value deals & promotions</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--success);">⭐ Quality Seekers</strong></td>
+                        <td>400 (40%)</td>
+                        <td>9.1/10</td>
+                        <td>5.5/10</td>
+                        <td>Premium ingredients & authenticity</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--accent);">⚖️ Balanced</strong></td>
+                        <td>300 (30%)</td>
+                        <td>7.5/10</td>
+                        <td>7.0/10</td>
+                        <td>Quality-to-price ratio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="section">
+            <h2 class="section-title">📊 Key Strategic Insights</h2>
+            <div class="insights-grid">
+                <div class="insight-card" style="border-left-color: var(--success);">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-title">High Market Interest</div>
+                    <div class="insight-text">
+                        60% of respondents expressed interest in visiting, with another 25% considering it. Total addressable market of 85% shows strong demand.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: var(--primary);">
+                    <div class="insight-icon">🧼</div>
+                    <div class="insight-title">Cleanliness is Critical</div>
+                    <div class="insight-text">
+                        Rated 8.5/10 - highest among all factors. Immaculate hygiene and visible cleanliness standards are non-negotiable for success.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: var(--accent);">
+                    <div class="insight-icon">👥</div>
+                    <div class="insight-title">Young Professional Target</div>
+                    <div class="insight-text">
+                        35% of respondents aged 26-35, representing the core demographic. Focus marketing on urban millennials and Gen Z.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: var(--info);">
+                    <div class="insight-icon">💵</div>
+                    <div class="insight-title">Premium Pricing Viable</div>
+                    <div class="insight-text">
+                        50% willing to pay $20+, with 25% accepting $25-30+. Quality-focused positioning can command premium prices.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: #7B1FA2;">
+                    <div class="insight-icon">🍛</div>
+                    <div class="insight-title">Jollof Rice Leads</div>
+                    <div class="insight-text">
+                        Most popular menu item with highest interest. Feature prominently in marketing and ensure consistent excellence in preparation.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: #00897B;">
+                    <div class="insight-icon">😊</div>
+                    <div class="insight-title">Positive Brand Perception</div>
+                    <div class="insight-text">
+                        72% positive sentiment in customer reviews. Strong foundation for word-of-mouth marketing and community building.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: var(--secondary);">
+                    <div class="insight-icon">📈</div>
+                    <div class="insight-title">Growth Opportunity</div>
+                    <div class="insight-text">
+                        60% have tried African food before - indicating both awareness and repeat potential. Education can convert the remaining 40%.
+                    </div>
+                </div>
+
+                <div class="insight-card" style="border-left-color: var(--success);">
+                    <div class="insight-icon">🎨</div>
+                    <div class="insight-title">Authenticity Matters</div>
+                    <div class="insight-text">
+                        Cultural authenticity rated 6.8/10 - moderate importance. Balance traditional preparation with accessibility for new customers.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations">
+            <h3>🚀 Strategic Recommendations</h3>
+            <ul>
+                <li><strong>Prioritize Hygiene Excellence:</strong> Make cleanliness visible and a key differentiator</li>
+                <li><strong>Target 26-35 Age Group:</strong> Focus digital marketing and social media on young professionals</li>
+                <li><strong>Premium Positioning:</strong> Position as quality experience worth $20-30+ per meal</li>
+                <li><strong>Feature Jollof Rice:</strong> Make signature dish the centerpiece of menu and marketing</li>
+                <li><strong>Education Program:</strong> Create content to introduce African cuisine to the 40% unfamiliar market</li>
+                <li><strong>Segment-Specific Marketing:</strong> Develop different value propositions for price-conscious vs. quality seekers</li>
+                <li><strong>Leverage Positive Sentiment:</strong> Build referral programs and encourage customer reviews</li>
+                <li><strong>Balance Authenticity:</strong> Maintain traditional flavors while making dishes accessible to newcomers</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>African Traditional Food Survey Analytics Dashboard | Sample Size: 1,000 Respondents</p>
+            <p style="margin-top: 0.5rem;">Data includes: Demographics, Preferences, Segmentation, Sentiment Analysis & Predictive Models</p>
+            <p style="margin-top: 0.5rem;">Analytics Pipeline: Chi-Square Tests, ANOVA, Linear & Logistic Regression, Random Forest, K-Means Clustering, Survival Analysis</p>
+        </div>
+    </div>
+</body>
+</html>
